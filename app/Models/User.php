@@ -19,9 +19,16 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'surname',
         'email',
+        'phone',
+        'country',
+        'gender',
         'password',
+        'profile_picture',
+        'introduction',
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -44,5 +51,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function toDomainEntity(): \App\Domain\Users\Entities\User
+    {
+        return new \App\Domain\Users\Entities\User(
+            $this->id,
+            $this->name,
+            $this->surname,
+            new \App\Domain\Users\ValueObjects\Email($this->email),
+            new \App\Domain\Users\ValueObjects\PhoneNumber($this->phone),
+            \App\Domain\Users\Enums\Country::from($this->country),
+            \App\Domain\Users\Enums\Gender::from($this->gender),
+            $this->password,
+            $this->profile_picture,
+            $this->introduction
+        );
     }
 }

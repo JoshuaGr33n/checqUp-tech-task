@@ -1,0 +1,458 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "User Management API",
+        "description": "API endpoints for managing users",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:9090",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List all users",
+                "operationId": "86da7ffa90ebcb83fd6edc1decc87c97",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Filter by user name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "country",
+                        "in": "query",
+                        "description": "Filter by country",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserCollection"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user",
+                "operationId": "0b8fd06d22eb99ce5e5b1e1f8bb29876",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "field": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user details",
+                "operationId": "ba27889f902067f4d88b4986346f29f5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user details",
+                "operationId": "c7820e58c24200ba622b65480e885318",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation errors",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "field": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user",
+                "operationId": "cc9206cfb1042fc070c7aa8e05100bea",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CreateUserRequest": {
+                "title": "Create User Request",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "surname": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "USA"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "male"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "password123"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "example": "password123"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateUserRequest": {
+                "title": "Update User Request",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Jane Doe"
+                    },
+                    "surname": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "jane@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "USA"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "male"
+                    },
+                    "profile_picture": {
+                        "type": "string",
+                        "example": "profiles/jane.jpg"
+                    },
+                    "introduction": {
+                        "type": "string",
+                        "example": "Hello world"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "password"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "example": "password123"
+                    }
+                },
+                "type": "object"
+            },
+            "UserCollection": {
+                "title": "User Collection",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserResource"
+                        }
+                    },
+                    "meta": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 10
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "UserResource": {
+                "title": "User Resource",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "surname": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "USA"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "male"
+                    },
+                    "profile_picture": {
+                        "type": "string",
+                        "example": "profiles/john.jpg"
+                    },
+                    "introduction": {
+                        "type": "string",
+                        "example": "Hello world"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Users",
+            "description": "Users"
+        }
+    ]
+}
