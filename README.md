@@ -206,4 +206,5 @@ php artisan test
 - This project follows **DDD best practices**, with clear separation between Domain, Application, Infrastructure, and Interface layers.
 - Swagger is integrated for detailed API documentation.
 - TDD is applied with thorough unit and feature tests.
+- This project has been designed with scalability and future expansion in mind
 
