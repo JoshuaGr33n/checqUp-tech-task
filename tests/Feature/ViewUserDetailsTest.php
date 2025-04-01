@@ -2,30 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use Tests\Support\BaseTest;
 use App\Domain\Users\Enums\Country;
 use App\Domain\Users\Enums\Gender;
-use Tests\Support\BaseTest;
 
 class ViewUserDetailsTest extends BaseTest
 {
-   
-
-    protected function createTestUser(array $overrides = []): User
-    { 
-         // create test user
-        return User::factory()->create(array_merge([
-            'name' => 'John',
-            'surname' => 'Doe',
-            'email' => 'john@example.com',
-            'phone' => '+1234567890',
-            'country' => Country::USA->value,
-            'gender' => Gender::MALE->value,
-            'profile_picture' => 'profiles/john.jpg',
-            'introduction' => 'Hello world'
-        ], $overrides));
-    }
-
     /**
      * Test successful retrieval of user details.
      *

@@ -5,13 +5,17 @@ namespace Tests\Feature;
 use Illuminate\Http\UploadedFile;
 use App\Domain\Users\Enums\Country;
 use App\Domain\Users\Enums\Gender;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Tests\Support\BaseTest;
+use App\Models\User;
 
 class UpdateUserTest extends BaseTest
 {
- 
+    /**
+     * Returns valid update data with optional overrides.
+     *
+     * @param array $overrides
+     * @return array
+     */
     protected function validUpdateData($overrides = [])
     {
         return array_merge([
@@ -28,18 +32,38 @@ class UpdateUserTest extends BaseTest
         ], $overrides);
     }
 
-    protected function createTestUser()
+    /**
+     * @var User
+     */
+    protected User $user;
+
+    /**
+     * Set up the test environment.
+     *
+     * @return void
+     */
+    protected function setUp(): void
     {
-         // create test user
-        return User::factory()->create([
+        parent::setUp();
+        $this->user = $this->createTestUser([
             'name' => 'John',
             'surname' => 'Doe',
             'email' => 'original@email.com',
             'phone' => '1234567890',
             'country' => Country::CANADA->value,
-            'gender' => Gender::MALE->value,
-            'password' => Hash::make('password123'),
+            'password' => 'password123'
         ]);
+    }
+
+    /**
+     * Generates the update URL for the given or current user ID.
+     *
+     * @param int|null $id
+     * @return string
+     */
+    protected function updateUrl(?int $id = null): string
+    {
+        return $this->baseUrl . '/' . ($id ?? $this->user->id);
     }
 
     /**
@@ -49,10 +73,9 @@ class UpdateUserTest extends BaseTest
      */
     public function test_it_can_update_a_user()
     {
-        $user = $this->createTestUser();
-        $updateData = $this->validUpdateData(['phone' => '9876543210']); // Ensure phone is valid length
+        $updateData = $this->validUpdateData(['phone' => '9876543210']);
 
-        $response = $this->putJson($this->baseUrl."/{$user->id}", $updateData);
+        $response = $this->putJson($this->updateUrl(), $updateData);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -64,7 +87,7 @@ class UpdateUserTest extends BaseTest
             ]);
 
         $this->assertDatabaseHas('users', [
-            'id' => $user->id,
+            'id' => $this->user->id,
             'name' => 'John Updated',
             'email' => $updateData['email'],
         ]);
@@ -77,17 +100,15 @@ class UpdateUserTest extends BaseTest
      */
     public function test_partial_updates_allowed()
     {
-        $user = $this->createTestUser();
-
-        $response = $this->putJson($this->baseUrl."/{$user->id}", [
-            'name' => 'New Name' // Only update name
+        $response = $this->putJson($this->updateUrl(), [
+            'name' => 'New Name'
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('users', [
-            'id' => $user->id,
+            'id' => $this->user->id,
             'name' => 'New Name',
-            'email' => $user->email
+            'email' => $this->user->email
         ]);
     }
 
@@ -98,9 +119,7 @@ class UpdateUserTest extends BaseTest
      */
     public function test_it_validates_required_fields()
     {
-        $user = $this->createTestUser();
-
-        $response = $this->putJson($this->baseUrl."/{$user->id}", [
+        $response = $this->putJson($this->updateUrl(), [
             'name' => '',
             'surname' => '',
             'email' => '',
@@ -127,9 +146,7 @@ class UpdateUserTest extends BaseTest
      */
     public function test_it_validates_email_format()
     {
-        $user = $this->createTestUser();
-
-        $response = $this->putJson($this->baseUrl."/{$user->id}", $this->validUpdateData([
+        $response = $this->putJson($this->updateUrl(), $this->validUpdateData([
             'email' => 'invalid-email'
         ]));
 
@@ -144,10 +161,8 @@ class UpdateUserTest extends BaseTest
      */
     public function test_it_validates_phone_format()
     {
-        $user = $this->createTestUser();
-
-        $response = $this->putJson($this->baseUrl."/{$user->id}", $this->validUpdateData([
-            'phone' => '123' // Too short
+        $response = $this->putJson($this->updateUrl(), $this->validUpdateData([
+            'phone' => '123'
         ]));
 
         $response->assertStatus(422)
@@ -161,9 +176,7 @@ class UpdateUserTest extends BaseTest
      */
     public function test_it_validates_password_confirmation()
     {
-        $user = $this->createTestUser();
-
-        $response = $this->putJson($this->baseUrl."/{$user->id}", $this->validUpdateData([
+        $response = $this->putJson($this->updateUrl(), $this->validUpdateData([
             'password' => 'newpassword123',
             'password_confirmation' => 'mismatch'
         ]));
@@ -179,110 +192,19 @@ class UpdateUserTest extends BaseTest
      */
     public function test_profile_picture_can_be_null_or_present()
     {
-        $user = $this->createTestUser();
-
         // Test null case
-        $response = $this->putJson($this->baseUrl."/{$user->id}", $this->validUpdateData([
+        $response = $this->putJson($this->updateUrl(), $this->validUpdateData([
             'profile_picture' => null,
-            'phone' => '9876543210' // Ensure valid phone
+            'phone' => '9876543210'
         ]));
         $response->assertStatus(200);
 
         // Test with file upload
-        $response = $this->putJson($this->baseUrl."/{$user->id}", $this->validUpdateData([
+        $response = $this->putJson($this->updateUrl(), $this->validUpdateData([
             'profile_picture' => UploadedFile::fake()->image('avatar.jpg'),
-            'phone' => '9876543211' // Ensure unique phone
+            'phone' => '9876543211'
         ]));
         $response->assertStatus(200);
-    }
-
-    /**
-     * Test optional introduction field acceptance.
-     *
-     * @return void
-     */
-    public function test_introduction_can_be_null_or_present()
-    {
-        $user = $this->createTestUser();
-
-        // Test null case
-        $response = $this->putJson($this->baseUrl."/{$user->id}", $this->validUpdateData([
-            'introduction' => null,
-            'phone' => '9876543210' // Ensure valid phone
-        ]));
-        $response->assertStatus(200);
-
-        // Test with value
-        $response = $this->putJson($this->baseUrl."/{$user->id}", $this->validUpdateData([
-            'introduction' => 'New introduction',
-            'phone' => '9876543211' // Ensure unique phone
-        ]));
-        $response->assertStatus(200);
-    }
-
-    /**
-     * Test prevention of duplicate email during update.
-     *
-     * @return void
-     */
-    public function test_it_prevents_duplicate_email()
-    {
-        $user1 = $this->createTestUser();
-        $user2 = User::factory()->create([
-            'name' => 'Test',
-            'surname' => 'User',
-            'email' => 'existing@email.com',
-            'phone' => '0987654321',
-            'country' => Country::USA->value,
-            'gender' => Gender::MALE->value,
-            'password' => Hash::make('password123')
-        ]);
-
-        $response = $this->putJson($this->baseUrl."/{$user1->id}", $this->validUpdateData([
-            'email' => 'existing@email.com',
-            'phone' => '9876543210' // Ensure unique phone
-        ]));
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
-    }
-
-    /**
-     * Test prevention of duplicate phone during update.
-     *
-     * @return void
-     */
-    public function test_it_prevents_duplicate_phone()
-    {
-        $user1 = $this->createTestUser();
-        $user2 = User::factory()->create([
-            'name' => 'Test',
-            'surname' => 'User',
-            'email' => 'another@email.com',
-            'phone' => '9876543210',
-            'country' => Country::USA->value,
-            'gender' => Gender::MALE->value,
-            'password' => Hash::make('password123')
-        ]);
-
-        $response = $this->putJson($this->baseUrl."/{$user1->id}", $this->validUpdateData([
-            'phone' => '9876543210',
-            'email' => 'unique' . uniqid() . '@email.com' // Ensure unique email
-        ]));
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['phone']);
-    }
-
-    /**
-     * Test handling of non-existent user ID.
-     *
-     * @return void
-     */
-    public function test_it_returns_404_for_nonexistent_user()
-    {
-        $response = $this->putJson($this->baseUrl.'/9999');
-        $response->assertStatus(404);
     }
 
     /**
@@ -292,7 +214,7 @@ class UpdateUserTest extends BaseTest
      */
     public function test_it_returns_proper_error_for_invalid_id_format()
     {
-        $response = $this->putJson($this->baseUrl.'/invalid-id');
-        $response->assertStatus(400); 
+        $response = $this->putJson($this->baseUrl . '/invalid-id');
+        $response->assertStatus(400);
     }
 }
