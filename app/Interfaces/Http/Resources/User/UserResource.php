@@ -35,7 +35,7 @@ class UserResource extends JsonResource
             'gender' => $this->getGender()->value,
             'profile_picture' => $this->getProfilePicture(),
             'introduction' => $this->getIntroduction(),
-            // 'created_at' => $this->getCreatedAt()?->toDateTimeString()
+            'created_at' => $this->getCreatedAt()?->format('Y-m-d H:i:s')
         ];
     }
 }

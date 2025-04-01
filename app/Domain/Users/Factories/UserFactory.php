@@ -30,7 +30,9 @@ class UserFactory
             Gender::from($data['gender']),
             $data['password'],
             $data['profile_picture'] ?? null,
-            $data['introduction'] ?? null
+            $data['introduction'] ?? null,
+            null
+
         );
     }
 
@@ -46,7 +48,8 @@ class UserFactory
             isset($data['gender']) ? Gender::from($data['gender']) : $existingUser->getGender(),
             $data['password'] ?? $existingUser->getPassword(), // Password remains unchanged if not provided
             $data['profile_picture'] ?? $existingUser->getProfilePicture(),
-            $data['introduction'] ?? $existingUser->getIntroduction()
+            $data['introduction'] ?? $existingUser->getIntroduction(),
+            null
         );
     }
 

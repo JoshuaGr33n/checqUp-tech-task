@@ -57,7 +57,7 @@ class UserServiceTest extends TestCase
 
         $this->fileUploadService->shouldReceive('upload')->once()->with($file)->andReturn('profiles/avatar.jpg');
 
-        $mockUser = new User(1, 'John', 'Doe', new Email('john@example.com'), new PhoneNumber('+1234567890'), Country::USA, Gender::MALE, 'hashed_password', 'profiles/avatar.jpg');
+        $mockUser = new User(1, 'John', 'Doe', new Email('john@example.com'), new PhoneNumber('+1234567890'), Country::USA, Gender::MALE, 'hashed_password', 'profiles/avatar.jpg', null, null);
         $this->userRepository->shouldReceive('create')->once()->andReturn($mockUser);
 
         $user = $this->userService->createUser($data);
@@ -73,7 +73,7 @@ class UserServiceTest extends TestCase
     public function it_deletes_old_profile_picture_during_update(): void
     {
         $this->userRepository->shouldReceive('exists')->once()->with(1)->andReturn(true);
-        $oldUser = new User(1, 'John', 'Doe', new Email('john@example.com'), new PhoneNumber('+1234567890'), Country::USA, Gender::MALE, 'hashed_password', 'profiles/old.jpg');
+        $oldUser = new User(1, 'John', 'Doe', new Email('john@example.com'), new PhoneNumber('+1234567890'), Country::USA, Gender::MALE, 'hashed_password', 'profiles/old.jpg', null, null);
         $file = UploadedFile::fake()->image('new.jpg');
         $data = ['profile_picture' => $file];
 
@@ -81,7 +81,7 @@ class UserServiceTest extends TestCase
         $this->fileUploadService->shouldReceive('delete')->once()->with('profiles/old.jpg')->andReturn(true);
         $this->fileUploadService->shouldReceive('upload')->once()->with($file)->andReturn('profiles/new.jpg');
 
-        $updatedUser = new User(1, 'John', 'Doe', new Email('john@example.com'), new PhoneNumber('+1234567890'), Country::USA, Gender::MALE, 'hashed_password', 'profiles/new.jpg');
+        $updatedUser = new User(1, 'John', 'Doe', new Email('john@example.com'), new PhoneNumber('+1234567890'), Country::USA, Gender::MALE, 'hashed_password', 'profiles/new.jpg', null, null);
         $this->userRepository->shouldReceive('update')->once()->with(1, Mockery::type(User::class))->andReturn($updatedUser);
 
         $result = $this->userService->updateUser(1, $data);

@@ -19,6 +19,7 @@ class User
     private string $password;
     private ?string $profilePicture;
     private ?string $introduction;
+    private ?\DateTimeInterface $created_at;
 
     public function __construct(
         ?int $id,
@@ -30,7 +31,8 @@ class User
         Gender $gender,
         string $password,
         ?string $profilePicture = null,
-        ?string $introduction = null
+        ?string $introduction = null,
+        ?\DateTimeInterface $created_at = null
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -42,6 +44,7 @@ class User
         $this->password = $password;
         $this->profilePicture = $profilePicture;
         $this->introduction = $introduction;
+        $this->created_at = $created_at;
     }
 
     public function getId(): ?int
@@ -92,5 +95,10 @@ class User
     public function getIntroduction(): ?string
     {
         return $this->introduction;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
     }
 }

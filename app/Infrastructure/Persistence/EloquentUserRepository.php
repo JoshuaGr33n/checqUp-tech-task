@@ -31,14 +31,14 @@ class EloquentUserRepository implements UserRepositoryInterface
             'gender',
             'password',
             'profile_picture',
-            'introduction'
+            'introduction',
+            'created_at'
         ];
 
         $query = User::select($columns);
 
         foreach ($filters as $key => $value) {
             if (!empty($value) && in_array($key, $columns)) {
-                // Apply basic filtering on the columns (can extend to more complex queries)
                 $query->where($key, 'like', '%' . $value . '%');
             }
         }
@@ -58,7 +58,8 @@ class EloquentUserRepository implements UserRepositoryInterface
                 Gender::from($user->gender),
                 $user->password,
                 $user->profile_picture,
-                $user->introduction
+                $user->introduction,
+                $user->created_at ? new \DateTime($user->created_at) : null
             );
         })->toArray();
     }

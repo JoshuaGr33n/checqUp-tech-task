@@ -65,7 +65,8 @@ class User extends Authenticatable
             \App\Domain\Users\Enums\Gender::from($this->gender),
             $this->password,
             $this->profile_picture,
-            $this->introduction
+            $this->introduction,
+            $this->created_at
         );
     }
 }
